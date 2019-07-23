@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+
+<body>
+				<div class="panel-heading">历史派单记录</div>
+				<div class="panel-body">
+						<table id="dispath_jqGrid" style="width: 100%"></table>
+						<div id="dispath_jqGridPager"></div>
+				 </div>
+			 
+</body>
+ <script type="text/javascript">
+ function getCacheTypeName(type,value){
+	  if(!value){
+		  return "-";
+	  }
+	  if(value){
+		   for(var k in vm.cacheInfo[type]){
+			   if(vm.cacheInfo[type][k].dictItemValue == value){
+				   return vm.cacheInfo[type][k].dictItemName ;
+			   }
+		   }
+	   }
+	   return value;
+}
+
+ 
+ $(function () { 
+		$("#dispath_jqGrid").jqGrid({
+			url: '../customerhospital/list',
+	        datatype: "json",
+	        postData:{'customerId': GetQueryString('customerId')},
+	        colModel: [	
+				{ label: '操作日期', name: 'createTime', width: 200 }, 	
+				{ label: '派单人', name: 'createName', width: 250 }, 			
+				{ label: '拍单项目', name: 'project', width: 200 
+					,formatter: function(value, options, row){
+						 return getCacheTypeName('plastic_project',value);
+					}		
+				
+				}, 	
+				{ label: '意向地区', name: 'intentionProvince', width: 150, formatter: function(value, options, row){
+					return  getCityShowName(value);
+				}},	
+// 				{ label: '意向地区', name: 'intentionProvince', width: 240 }, 	
+				{ label: '分配医院', name: 'hopitalName', width: 200 } 			
+	        ],
+			viewrecords: true,
+	        height: 385,
+	        rowNum: 10,
+			rowList : [10,30,50],
+	        rownumbers: true, 
+	        rownumWidth: 25, 
+	        autowidth:true,
+	        multiselect: false,
+	        pager: "#dispath_jqGridPager",
+	        jsonReader : {
+	            root: "page.list",
+	            page: "page.currPage",
+	            total: "page.totalPage",
+	            records: "page.totalCount"
+	        },
+	        prmNames : {
+	            page:"page", 
+	            rows:"limit", 
+	            order: "order"
+	        },
+	        gridComplete:function(){
+	        	//隐藏grid底部滚动条
+	        	$("#dispath_jqGrid").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" }); 
+	        }
+	    });
+ });	
+ 	
+ </script>
+</html>

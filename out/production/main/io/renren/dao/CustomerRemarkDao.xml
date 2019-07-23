@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.CustomerRemarkDao">
+
+	<select id="queryObject" resultType="io.renren.entity.CustomerRemarkEntity">
+		select * from customer_remark where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="io.renren.entity.CustomerRemarkEntity">
+		select * from customer_remark 
+		where 1=1 
+		<if test="createUserId != null">
+			 and  create_user_id = #{createUserId}
+		</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from customer_remark 
+		where 1=1 
+		<if test="createUserId != null">
+			 and  create_user_id = #{createUserId}
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="io.renren.entity.CustomerRemarkEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into customer_remark
+		(
+			`customer_id`, 
+			`next_follow_time`, 
+			`last_follow_time`, 
+			`isFollow`, 
+			`status`, 
+			`weight`, 
+			`current_remark`, 
+			`next_remark`, 
+			`create_time`, 
+			`create_user_id`, 
+			`last_update_time`, 
+			`last_update_user_id`
+		)
+		values
+		(
+			#{customerId}, 
+			#{nextFollowTime}, 
+			#{lastFollowTime}, 
+			#{isfollow}, 
+			#{status}, 
+			#{weight}, 
+			#{currentRemark}, 
+			#{nextRemark}, 
+			#{createTime}, 
+			#{createUserId}, 
+			#{lastUpdateTime}, 
+			#{lastUpdateUserId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="io.renren.entity.CustomerRemarkEntity">
+		update customer_remark 
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="nextFollowTime != null">`next_follow_time` = #{nextFollowTime}, </if>
+			<if test="lastFollowTime != null">`last_follow_time` = #{lastFollowTime}, </if>
+			<if test="isfollow != null">`isFollow` = #{isfollow}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="weight != null">`weight` = #{weight}, </if>
+			<if test="currentRemark != null">`current_remark` = #{currentRemark}, </if>
+			<if test="nextRemark != null">`next_remark` = #{nextRemark}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="lastUpdateTime != null">`last_update_time` = #{lastUpdateTime}, </if>
+			<if test="lastUpdateUserId != null">`last_update_user_id` = #{lastUpdateUserId}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from customer_remark where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from customer_remark where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

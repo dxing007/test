@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- import CSS -->
+  <link rel="stylesheet" href="${rc.contextPath}/statics/plugins/elementui/index.css">
+</head>
+<body>
+  <div id="app" v-cloak>
+<!--  			<el-button type="text" @click="dialogVisible = true">点击打开 Dialog</el-button>  -->
+
+<!-- 			<el-dialog -->
+<!-- 			  title="提示" -->
+<!-- 			  :visible.sync="dialogVisible" -->
+<!-- 			  width="60%" -->
+<!-- 			  :before-close="handleClose"> -->
+ <el-card class="box-card">
+  	<div slot="header" class="clearfix">
+    <span>修改医院</span>	   
+	</div>
+					  
+	  <el-form ref="ruleForm" :model="form"  :rules="rules"   label-width="120px">
+		  
+		  <el-form-item label="医院名称"  prop="name"  > 
+		      <el-col :span="8">
+		      		<el-input v-model="form.name"></el-input>
+		      </el-col>
+		  </el-form-item>
+		  
+		  <el-form-item label="状态" prop="statue"  :rules="[{ required: true, message: '状态不能为空'} ]" >
+		   			 <el-radio-group v-model="form.statue">
+					      <el-radio  :label="0">启用</el-radio>
+					      <el-radio  :label="1">禁用</el-radio>
+			    	</el-radio-group>
+		  </el-form-item>
+		  
+		  <el-form-item label="地区" prop="regionCode"  :rules="[{ required: true, message: '地区不能为空'} ]">
+		        <el-col :span="4">
+		   			 <el-select v-model="form.region_province" @change="setCityList" placeholder="请选择省份">
+		    			  <el-option   v-for="item in  provinceList" :key="item.code" :label="item.names" :value="item.code"></el-option>
+		    		</el-select>
+		   		</el-col>
+		   		<el-col :span="4">
+		   			 <el-select v-model="form.regionCode"   ref="reginCodeFef"   @change="unloadData" clearable placeholder="请选择城市">
+		    			  <el-option   v-for="item in cityList" :key="item.code" :label="item.names" :value="item.code"></el-option>
+		    		</el-select>
+		   		</el-col>
+		  </el-form-item>
+		  
+		   <el-form-item label="是否公立医院">
+			    <el-radio-group v-model="form.isPublic">
+			      <el-radio label="0">公立</el-radio>
+			      <el-radio label="1">私立</el-radio>
+			    </el-radio-group>
+  			</el-form-item>
+		  
+		   <el-form-item label="医院网站"     > 
+		      <el-col :span="8">
+		      		<el-input v-model="form.url"></el-input>
+		      </el-col>
+		  </el-form-item>
+		  
+		   <el-form-item label="返点"     > 
+		      <el-col :span="8">
+		      		<el-input v-model="form.rebate"></el-input>
+		      </el-col>
+		  </el-form-item> 
+		  
+		   <el-form-item label="权重"      > 
+		      <el-col :span="8">
+		      		 <el-input-number v-model="form.weightCoefficient" :min="1" :max="100" label="权重"></el-input-number>
+		      </el-col>
+		  </el-form-item>
+		  
+		  <el-form-item label="项目"    > 
+		      <el-col :span="8">
+		      		<el-input v-model="form.project"></el-input>
+		      </el-col>
+		  </el-form-item> 
+		  
+		  <el-form-item label="医生信息"     > 
+		      <el-col  >
+		      		<el-input type="textarea" autosize v-model="form.doctorInfo"></el-input>
+		      </el-col>
+		  </el-form-item> 
+		  
+		  
+		  <el-form-item label="描述">
+		    <el-input type="textarea" autosize v-model="form.describe"></el-input>
+		  </el-form-item>
+		  <el-form-item>
+		    <el-button type="primary" @click="onSubmit">保存</el-button>
+		    <!-- 	<a class="btn btn-primary" href="testElModel.html" >返回</a> -->
+		    <el-button @click="returnDetail" >取消</el-button>
+		  </el-form-item>
+		</el-form>
+			 
+<!-- 			 <el-table -->
+<!-- 			      :data="tableData" -->
+<!-- 			      style="width: 100%"> -->
+<!-- 			      <el-table-column  prop="showWeight"   label="权重"   width="150">    </el-table-column> -->
+<!-- 			      <el-table-column  prop="createTime"  label="创建时间"   width="200"> </el-table-column> -->
+<!-- 			      <el-table-column prop="nextTime"  label="下次联系时间"   width="200"> </el-table-column> -->
+<!-- 			      <el-table-column  prop="currentRemark"  label="当前情况"   width="510"> </el-table-column> -->
+<!-- 			      <el-table-column  prop="nextRemark"  label="下次情况"   width="500"> </el-table-column> -->
+<!-- 			 </el-table> -->
+			  
+<!-- 			  <span slot="footer" class="dialog-footer"> -->
+<!-- 			  	<a class="btn btn-primary" href="testElModel.html" >返回</a> -->
+<!-- 			    <el-button @click="dialogVisible = false">返回</el-button> -->
+<!-- 			    <el-button type="primary" @click="dialogVisible = false">确 定</el-button> -->
+<!-- 			  </span> -->
+		 </el-card>
+<!-- 			</el-dialog> -->
+						
+  </div>
+</body>
+  <!-- import Vue before Element -->
+<script src="${rc.contextPath}/statics/libs/jquery.min.js"></script>
+  <script src="${rc.contextPath}/statics/libs/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="${rc.contextPath}/statics/libs/elm_ui_index.js"></script>
+<script src="${rc.contextPath}/statics/util/address.js"></script> 
+<script src="${rc.contextPath}/statics/util/addressUtil.js"></script> 
+<script>
+  
+//从地址或取参数
+  function GetQueryString(name) {
+  	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+  	var r = window.location.search.substr(1).match(reg);
+  	if (r != null)
+  		return unescape(r[2]);
+  	return null;
+  }
+  
+  $(function () {
+	  //el.init(); 
+
+  var el = new Vue({
+      el: '#app',
+      mounted: function() {
+          var el = this;
+          setTimeout(function(){
+				 el.init();
+       	  },100);
+      },
+      data: function() {
+        return { 
+        	visible: true,
+        	dialogVisible:false,
+            form: {
+            	name:"",
+            	statue: 0
+            },
+            dataVisible:false,
+            cacheInfo:{},
+            tableData:[],
+            provinceList : getProvinceList(),
+			cityList : [],
+			rules: {
+                name: [{
+                    required: true,
+                    message: '请输入医院名称',
+                    trigger: 'blur'
+                }],
+//                 description: [{
+//                     required: true,
+//                     message: '请输入描述信息',
+//                     trigger: 'blur'
+//                 }],
+                // key: [{
+                //     validator: checkKey,
+                //     trigger: 'blur'
+                // }]
+            }
+		}
+        
+      },
+      
+      methods: {
+    	init: function (){
+    		el.queryCache();
+    		el.form.id = GetQueryString("id");
+    		el.queryHospitInfo();
+    	},
+    	handleClose: function () {
+    		  el.dialogVisible = false;
+  		},
+  		onSubmit:function(){
+  			if(!el.form.name){
+  				 this.$message.error('医院名称不能为空');
+  				 return ;
+  			}
+  			if(el.form.statue==null){
+ 				 this.$message.error('设置医院状态不能为空');
+ 				 return ;
+ 			}
+  			if(!el.form.regionCode){
+ 				 this.$message.error('地区不能为空');
+ 				 return ;
+ 			}
+  			
+  			console.log(el.form.name);
+  			var url = (el.form.id==null ||el.form.id=='' ) ? "../hospitalinfo/save" : "../hospitalinfo/update" ;
+ 			//表单验证方法
+  			$.ajax({
+				type: "POST",
+			    url: url,
+			    data:JSON.stringify(el.form),
+			    dataType: 'json',contentType:'application/json;charset=UTF-8',   
+			    success: function(r){
+			    	console.log(r);
+			    	el.$message({
+			            message: '保存成功',
+			            type: 'success'
+			          });
+			    	//返回详情
+			    	el.returnDetail();
+				}
+			});
+  		},
+  		changeSwitch:function(){
+  			if(el.form.isFollow==true){
+  				el.form.nextFollowTime = '';
+  			}
+  		},
+  		queryCache : function (){
+			$.ajax({
+				type: "POST",
+			    url: "../basedict/queryBaseDictMapByCodes",
+			    data:JSON.stringify( ["user_type","remark_weight"]),
+			    dataType: 'json',contentType:'application/json;charset=UTF-8',   
+			    success: function(r){
+			    	console.log(r);
+			    	el.cacheInfo = r ;
+				}
+			});
+		},
+		queryHospitInfo:function(){
+			if(!el.form.id){
+				return ;
+			}
+			var that = el;
+			$.ajax({
+				type: "POST",
+			    url: "../hospitalinfo/info/"+el.form.id,
+  			    dataType: 'json',contentType:'application/json;charset=UTF-8',   
+			    success: function(r){
+			    	console.log(r);
+			    	//el.form = {};
+// 			    	el.form = r.hospitalInfo;
+// 			    	console.log(666);
+  			    	console.log(r.hospitalInfo);
+					that.form.name = "";
+					that.form = r.hospitalInfo;
+					
+					if(r.hospitalInfo.regionCode){
+						that.form.region_province = r.hospitalInfo.regionCode.substring(0, 2) + '0000';
+						that.setCityList(that.form.region_province);
+					}
+				}
+			});
+		},
+		returnDetail: function(){
+			self.location='hospitalinfo.html'; 
+		}
+		,getCacheTypeName:function(type,value){
+			   if(value){
+				   for(var k in el.cacheInfo[type]){
+					   if(el.cacheInfo[type][k].dictItemValue == value){
+						   return el.cacheInfo[type][k].dictItemName ;
+					   }
+				   }
+			   }
+			   return value;
+		},
+		toUpdaeData: function(){
+			this.$forceUpdate();
+		},
+		setCityList : function(value) {
+			console.log(value);
+			var _cityList = getCityList(value);
+			el.cityList = [];
+			console.log(this.$refs['reginCodeFef']);
+			this.$refs['reginCodeFef'].clear;
+			for ( var k in _cityList) {
+				el.cityList.push(_cityList[k]);
+			}
+			el.form.regionCode = el.cityList[0].code;
+		},
+		unloadData :function (){
+			this.$forceUpdate();
+		}
+		
+      }	
+     
+    })
+  });
+  </script>
+</html>

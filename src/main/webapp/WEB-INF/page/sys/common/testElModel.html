@@ -1,0 +1,25 @@
+<html>
+	<head>
+	<link rel="stylesheet" href="${rc.contextPath}/statics/plugins/elementui/index.css">
+		<title>标题！！！！！！！！</title>
+	</head>
+	<el-input v-model="input" placeholder="请输入内容"></el-input>
+	
+	<body>
+				 <el-radio v-model="radio" label="1">备选项</el-radio>
+				  <el-radio v-model="radio" label="2">备选项</el-radio>
+	</body>
+	 <!-- import Vue before Element -->
+<!--   <script src="https://unpkg.com/vue/dist/vue.js"></script> -->
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script>
+ export default {
+    data () {
+      return {
+        radio: '1'
+      };
+    }
+  }
+  </script>
+</html>

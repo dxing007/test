@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("basedict:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("basedict:update"))
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("basedict:delete"))
+			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+		
+			 <div class="form-group">
+			   	<div class="col-sm-2 control-label">数据字典类别key</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="baseDict.dictId" placeholder="数据字典类别key"/>
+			    </div>
+			</div>
+		
+			 <div class="form-group">
+			   	<div class="col-sm-2 control-label">数据字典类别代码</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="baseDict.dictTypeCode" placeholder="数据字典类别代码"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">数据字典类别名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="baseDict.dictTypeName" placeholder="数据字典类别名称"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">数据字典项目名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="baseDict.dictItemName" placeholder="数据字典项目名称"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">数据字典项目值</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="baseDict.dictItemValue" placeholder="数据字典项目值"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">数据字典项目代码(可为空)</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="baseDict.dictItemCode" placeholder="数据字典项目代码(可为空)"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">排序字段</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="baseDict.dictSort" placeholder="排序字段"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">1:使用 0:停用</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="baseDict.dictEnable" placeholder="1:使用 0:停用"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">备注</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="baseDict.dictMemo" placeholder="备注"/>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/basedict.js?_${date.systemTime}"></script>
+</body>
+</html>

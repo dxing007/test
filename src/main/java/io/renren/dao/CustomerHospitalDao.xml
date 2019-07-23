@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.CustomerHospitalDao">
+
+	<select id="queryObject" resultType="io.renren.entity.CustomerHospitalEntity">
+		select * from customer_hospital where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="io.renren.entity.CustomerHospitalEntity">
+		  SELECT ch.*,h.name hopitalName , c.name createName  FROM customer_hospital  ch , `hospital_info` h , `sys_user` c  
+		  WHERE ch.`hospital_id` = h.`id`  AND  ch.create_user_id = c.user_id
+		<if test="customerId != null">
+				and ch.`customer_id` = #{customerId}
+		 </if>
+		<if test="hospitalId != null">
+				and ch.`hospital_id` = #{hospitalId}
+		 </if>
+		 <if test="distributionUserId != null ">
+				and ch.`distribution_user_id` = #{distributionUserId}
+		 </if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		  SELECT count(*)  FROM customer_hospital  ch , `hospital_info` h , `sys_user` c  
+		  WHERE ch.`hospital_id` = h.`id`  AND  ch.create_user_id = c.user_id
+		<if test="customerId != null">
+				and ch.`customer_id` = #{customerId}
+		 </if>
+		<if test="hospitalId != null">
+				and ch.`hospital_id` = #{hospitalId}
+		 </if>
+		 <if test="distributionUserId != null ">
+				and ch.`distribution_user_id` = #{distributionUserId}
+		 </if>
+	</select>
+	 
+	<insert id="save" parameterType="io.renren.entity.CustomerHospitalEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into customer_hospital
+		(
+			`customer_id`, 
+			`hospital_id`, 
+			`hospital_admin_id`,
+			`documentary_state`, 
+			`intention_province`, 
+			`project`, 
+			`distribution_user_id`, 
+			`create_time`, 
+			`create_user_id`, 
+			`last_update_time`, 
+			`last_update_user_id`
+		)
+		values
+		(
+			#{customerId}, 
+			#{hospitalId}, 
+			#{hospitalAdminId}, 
+			#{documentaryState}, 
+			#{intentionProvince}, 
+			#{project}, 
+			#{distributionUserId}, 
+			#{createTime}, 
+			#{createUserId}, 
+			#{lastUpdateTime}, 
+			#{lastUpdateUserId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="io.renren.entity.CustomerHospitalEntity">
+		update customer_hospital 
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="hospitalId != null">`hospital_id` = #{hospitalId}, </if>
+			<if test="hospitalAdminId != null">`hospital_admin_id` = #{hospitalAdminId}, </if>
+			<if test="documentaryState != null">`documentary_state` = #{documentaryState}, </if>
+			<if test="intentionProvince != null">`intention_province` = #{intentionProvince}, </if>
+			<if test="project != null">`project` = #{project}, </if>
+			<if test="distributionUserId != null">`distribution_user_id` = #{distributionUserId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="lastUpdateTime != null">`last_update_time` = #{lastUpdateTime}, </if>
+			<if test="lastUpdateUserId != null">`last_update_user_id` = #{lastUpdateUserId},</if>
+			 
+			<if test="earnestMoney != null">`earnest_money` = #{earnestMoney}, </if>
+			<if test="turnoverAmount != null">`turnover_amount` = #{turnoverAmount}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from customer_hospital where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from customer_hospital where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<insert id="saveBatch" parameterType="java.util.ArrayList"   keyProperty="id">
+		insert into customer_hospital
+		(
+			`customer_id`, 
+			`hospital_id`, 
+			`hospital_admin_id`, 
+			`documentary_state`, 
+			`intention_province`, 
+			`project`, 
+			`distribution_user_id`, 
+			`create_time`, 
+			`create_user_id`, 
+			`last_update_time`, 
+			`last_update_user_id`
+		)
+		  VALUES   
+        <foreach collection="list" item="emp" index="index"  separator=",">  
+            (
+			#{emp.customerId}, 
+			#{emp.hospitalId}, 
+			#{emp.hospitalAdminId}, 
+			#{emp.documentaryState}, 
+			#{emp.intentionProvince}, 
+			#{emp.project}, 
+			#{emp.distributionUserId}, 
+			#{emp.createTime}, 
+			#{emp.createUserId}, 
+			#{emp.lastUpdateTime}, 
+			#{emp.lastUpdateUserId}
+		)
+        </foreach>
+	</insert>
+	
+	<select id="queryHospitalCountInfo" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT  h.id,h.name ,h.region_code 
+		 ,COUNT(h.id) customerNum  
+		 ,(SELECT GROUP_CONCAT(DISTINCT b.dict_item_name) FROM `base_dict` b  , customer_hospital ch1 WHERE ch1.hospital_id = h.id AND b.dict_type_code  ='plastic_project' AND b.dict_item_value = ch1.`project` )  projectNames
+		 , SUM( ch.earnest_money ) earnestMoneySum
+		 , SUM( ch.turnover_amount ) turnoverAmountSum
+		 ,MAX(ch.last_update_time) lastUpdateTime
+		   FROM  `hospital_info` h  , `customer_hospital` ch  WHERE h.id = ch.hospital_id  
+	    <if test="beginTime != null">
+	    	 <![CDATA[
+			 	`last_update_time` > #{beginTime},
+			 ]]>
+	     </if>
+		<if test="entTime != null">
+		 	<![CDATA[
+			 	`last_update_time` < #{entTime}
+			 ]]>
+		</if>
+		<if test="regionCode != null">
+				and region_code like concat( #{regionCode}, '%') 
+			</if>
+		  GROUP BY  h.id 
+		 order by lastUpdateTime  desc 
+		 <if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	
+	<select id="queryHospitalCount" parameterType="java.util.Map" resultType="int" >
+        SELECT COUNT(*) FROM ( 
+		SELECT   h.id 
+		   FROM  `hospital_info` h  , `customer_hospital` ch  WHERE h.id = ch.hospital_id  
+	    <if test="beginTime != null">
+	    	 <![CDATA[
+			 	`last_update_time` > #{beginTime},
+			 ]]>
+	     </if>
+		<if test="entTime != null">
+		 	<![CDATA[
+			 	`last_update_time` < #{entTime}
+			 ]]>
+		</if>
+		<if test="regionCode != null">
+				and region_code like concat( #{regionCode}, '%') 
+			</if>
+		  GROUP BY  h.id 
+		) t 
+	</select>
+
+</mapper>

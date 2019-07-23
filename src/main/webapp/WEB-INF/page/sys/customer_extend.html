@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+  	<script type="text/javascript" src="${rc.contextPath}/statics/plugins/ueditor/dimeng_ueditor_init.js?t=8978979" charset="gbk"></script>
+<body>
+
+	<div class="row"  >
+		#parse("sys/common/customerBaseInfoModel2.html")
+		<div class="col-md-3">
+			<div class="panel panel-default">
+				<div class="panel-heading">顾客基础信息（1/2 步，已完成）
+				#if($shiro.hasPermission("customer:baseUpdate"))
+					<button  type="button"  style="float:right;padding-top: 0px;padding:2px 16px;margin-right: 6px;" @click="toUpdateBaseInfo" class="btn btn-default">修改</button> 
+				#end
+				</div>
+				<div class="panel-body">
+						<div class="row" style="border-top:0">
+							  <div class="col-md-4">顾客姓名:</div>
+							  <div class="col-md-8">{{customerBaseInfo.name}}</div>
+						 </div>
+					 	<div class="row" style="border-top:0">
+							  <div class="col-md-4">性别</div>
+							  <div class="col-md-8">{{customerBaseInfo.sex ==1 ? '男':'女'}}</div>
+						 </div>
+						 <div class="row" style="border-top:0">
+							  <div class="col-md-4">手机</div>
+							  <div class="col-md-8">{{customerBaseInfo.telephone}}</div>
+						 </div>
+					 
+						  <div class="row" style="border-top:0">
+							  <div class="col-md-4">QQ</div>
+							  <div class="col-md-8">{{customerBaseInfo.qq}}</div>
+						 </div>
+						  <div class="row" style="border-top:0">
+							  <div class="col-md-4">邮箱</div>
+							  <div class="col-md-8">{{customerBaseInfo.email}}</div>
+						 </div>
+						  <div class="row" style="border-top:0">
+							  <div class="col-md-4">微信</div>
+							  <div class="col-md-8">{{customerBaseInfo.wechat}}</div>
+						 </div>
+						  <div class="row" style="border-top:0">
+							  <div class="col-md-4">微博</div>
+							  <div class="col-md-8">{{customerBaseInfo.microblog}}</div>
+						 </div>
+						 
+				</div>
+			</div>
+		</div>
+		<div class="col-md-9">
+			<div class="panel panel-default">
+				<div class="panel-heading">为顾客填加消费记录并派单（2/2步）带*号为必填
+				<button type="button" style="float:right;padding-top: 0px;padding:2px 16px;" @click="returnCustomerList" class="btn btn-default">返回列表</button> 
+				</div>
+				<div class="panel-body">
+					<form class="form-horizontal"   id="exFromId">
+							<input type="hidden" name="customerId" :value="customerBaseInfo.id">
+							<div class="form-group">
+							   	<label class="col-sm-2 control-label"><i style="color: red" >*</i>信息来源</label>
+							   	<div class="col-lg-8">
+							     	   <select class="form-control" v-model="customerExtendInfo.infoSource"     >
+			                                <option value="">-- 选择客户来源 --</option>
+			                               <option  v-for="item in  cacheInfo.info_source"  :value="item.dictItemValue" :key="item.dictItemValue" >{{item.dictItemName}}</option>
+			                            </select>
+							    </div>
+							</div>
+							
+							
+							<div class="form-group">
+									<label class="col-sm-2 control-label"> <i style="color: red">*</i>所在地址
+									</label>
+									<div class="col-sm-4">
+										<select name="input_province"  v-model="customerBaseInfo.input_province"   class="form-control"   onchange="setCity(this.value,'cityList')"  > 
+											  <template v-for = "item in provinceList">
+												 	<option :value="item.code">{{item.names}}</option>
+											 </template>
+										</select>
+									</div>
+									<div class="col-sm-4">
+										<select v-model="customerBaseInfo.locatedRegionCode"    required data-bv-notempty-message="所在地区必须选"  id="input_city" class="form-control">
+											<template v-for = "item in cityList">
+												 <option  :value="item.code">{{item.names}}</option>
+											</template>
+										</select>
+									</div>
+									<!-- <div class="col-sm-3">
+										<select name="input_area" id="input_area" class="form-control">
+											<option value=""></option>
+										</select>
+									</div> -->
+						  </div>
+						  
+						  <div class="form-group">
+									<label class="col-sm-2 control-label"> <i style="color: red">*</i>意向地区 
+									</label>
+									<div class="col-sm-4">
+										<select v-model="customerExtendInfo.intention_province"  onchange="setCity(this.value,'locatedCityList')" id="intention_province"
+											class="form-control">
+											<option  v-for="item in provinceList" :value="item.code" :key="item.code" >{{item.names}}</option>
+										</select>
+									</div>
+									<div class="col-sm-4">
+										<select v-model="customerExtendInfo.intentionAreaCode"   required data-bv-notempty-message="意向地区必须选"   id="intention_city" class="form-control">
+											<option  v-for="item in locatedCityList"  :value="item.code" :key="item.code" >{{item.names}}</option>
+										</select>
+									</div>
+						  </div>
+						  
+						  
+						  <div class="form-group">
+									<label class="col-sm-2 control-label">备选地区
+									</label>
+									<div class="col-sm-4">
+										<select v-model="customerExtendInfo.bak_province" id="bak_province"  onchange="setCity(this.value,'bakCityList')"  
+											class="form-control">
+												<option  v-for="item in provinceList"  :value="item.code" :key="item.code" >{{item.names}}</option>
+										</select>
+									</div>
+									<div class="col-sm-4">
+										<select v-model="customerExtendInfo.bakAreaCode" id="intention_province" class="form-control">
+											<option  v-for="item in  bakCityList"  :value="item.code" :key="item.code" >{{item.names}}</option>
+										</select>
+									</div>
+						  </div>
+							
+						  <div class="form-group">
+									<label class="col-sm-2 control-label"> <i style="color: red">*</i>项目
+									</label>
+									<div class="col-sm-4">
+										<select v-model="customerExtendInfo.beautyItemCode"  required data-bv-notempty-message="请选择项目"  id="" lass="form-control" class="form-control">
+											<option value="">--请选择--</option>
+											<option  v-for="item in  cacheInfo.plastic_project"  :value="item.dictItemValue" :key="item.dictItemValue" >{{item.dictItemName}}</option>
+										</select>
+									</div>
+									 
+						  </div>
+						  
+						   <div class="form-group" v-if="selectHospit!=null && selectHospit.length>0">
+									<label class="col-sm-2 control-label">医院信息
+									</label>
+									<div class="col-sm-4">
+											<div v-for="item in  selectHospit" style="padding-top: 4px">
+										 		<span  class="label label-info">{{item.name}}</span> 
+										 	</div>
+									</div>
+									 
+						  </div>
+						  
+						   <div class="form-group">
+									<label class="col-sm-2 control-label"> <i style="color: red">*</i>派单医院
+									</label>
+									<div class="col-sm-4">
+										 <button type="button" id="seleHosptBt" @click="showHopit"  >选择医院</button>
+									</div>
+						  </div>
+						  
+						  <div class="form-group">
+									<label class="col-sm-2 control-label">派单说明
+									</label> 
+							<div>
+								<div class="col-sm-8">
+									<script id="editor" type="text/plain">  	
+											 {{customerExtendInfo.describe}}								
+									</script>
+
+									
+									</div>
+							</div>
+						</div>
+						
+						  <div class="form-group">
+									<label class="col-sm-2 control-label"> 
+									</label>
+									<div class="col-sm-6">
+										<button type="button" @click="saveExtendCustomer"  class="btn btn-default">提交</button>
+										&nbsp;&nbsp;&nbsp;<input type="checkbox" checked="checked"  v-model="customerExtendInfo.sendMessage"  value="1" />&nbsp;向顾客发送短信
+										
+									</div>
+									<div class="col-sm-3" >
+										<button type="button" style="float:right" @click="returnCustomerList"  class="btn btn-default">返回列表</button>
+									</div>
+						  </div>
+						
+					</form>				
+				</div>
+					 
+			</div>
+				<div class="panel panel-default">
+					#parse("sys/common/dispatch_log_list.html")
+				</div>
+		 		 #parse("sys/common/hospital_list.html")  
+		 	<!-- 	#parse("sys/common/customerBaseInfoModel2.html")  -->
+			
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+$(function () {
+	
+	 $("#exFromId").bootstrapValidator({  
+	        live: 'disabled',//验证时机，enabled是内容有变化就验证（默认），disabled和submitted是提交再验证  
+	        excluded: [':disabled', ':hidden', ':not(:visible)'],//排除无需验证的控件，比如被禁用的或者被隐藏的  
+	        submitButtons: '#btn-test',//指定提交按钮，如果验证失败则变成disabled，但我没试成功，反而加了这句话非submit按钮也会提交到action指定页面  
+	        message: '通用的验证失败消息',//好像从来没出现过  
+	        feedbackIcons: {//根据验证结果显示的各种图标  
+	            valid: 'glyphicon glyphicon-ok',  
+	            invalid: 'glyphicon glyphicon-remove',  
+	            validating: 'glyphicon glyphicon-refresh'  
+	        },  
+	        fields: {   //自定义验证
+// 	            name: {  
+// 	                validators: {  
+//   	                    notEmpty: {//检测非空,radio也可用  
+//   	                        message: '文本框必须输入'  
+//  	                    },   
+// 	                }  
+// 	            },
+	        }  
+	    });  	
+	 
+	 $("#ex-btn").click(function () {//非submit按钮点击后进行验证，如果是submit则无需此句直接验证  
+	    	var formDataJson = formToJson($("#exFromId"));
+	    	console.log(formDataJson);
+	    	//validatorForm.validate("baseCustomerFormId");
+	    	$("#exFromId").bootstrapValidator('validate');//提交验证  
+	        if ($("#exFromId").data('bootstrapValidator').isValid()) {//获取验证结果，如果成功，执行下面代码  
+	        	var describe = UE.getEditor('editor').getPlainTxt() ;
+	        	console.log(vm.selectHospit);
+	        	/* if(vm.selectHospit.length==0){
+					alert("请选择分派医院");
+					return ;
+	        	} */
+	        	formDataJson.hospitalList= vm.selectHospit;
+	        	formDataJson.describe = describe;
+	        	console.log('发送了………………');
+	        	console.log(formDataJson);
+	        	var url = "../customerextend/save";
+	        	$.ajax({
+					type: "POST",
+				    url: url,
+				    data: JSON.stringify(formDataJson),
+				    success: function(r){
+				    	if(r.code === 0){
+							alert('派音成功', function(index){
+								//vm.reload();
+								
+							});
+						}else{
+							alert(r.msg);
+						}
+					}
+				});
+	        }  
+	    }); 
+});
+
+
+ 
+function getwidth(){
+	var width = $(window).width() ;
+	console.log(width);
+    if(width>1400){
+    	return 649;
+    }else if(width<1400 && width>1000 ) {
+    	return 500;
+    }else{
+    	return 400;
+    }
+}
+
+
+
+
+
+var editor = new UE.ui.Editor({
+	UEDITOR_HOME_URL:"../statics/plugins/ueditor/",
+	imageManagerUrl:"/getFileToUeditor.do?var="+new Date().getTime(),
+	imageManagerPath:"http://img1.taojindi.com/cms/2012/",
+	initialFrameWidth:getwidth(),  //初始化编辑器宽度,默认1000
+	initialFrameHeight:410  //初始化编辑器高度,默认320
+	,autoHeightEnabled:false
+	,autoFloatEnabled:false
+});  
+ editor.render("editor");  
+ function getPlainTxt() {
+     var arr = [];
+     arr.push( "使用editor.getPlainTxt()方法可以获得编辑器的带格式的纯文本内容" );
+     arr.push( "内容为：" );
+     arr.push(  UE.getEditor('editor').getPlainTxt() );
+     alert( arr.join( '\n' ) )
+ }
+//1.2.4以后可以使用一下代码实例化编辑器 
+//UE.getEditor('myEditor') 
+
+//var e = new DM.ui.Editor({
+	  DM_EDITOR_ID:"myEditor1"
+	  // initialFrameWidth:1000
+//});
+//   e.render("myEditor1");
+/*editor.ready(function(){
+//需要ready后执行，否则可能报错
+	 editor.setContent("7897987978888");
+ alert( editor.getContent()+"111111");
+}) ;
+alert("1111111111111111111");
+DM.ui.getContent(editor)*/
+//setTimeout(function(){ DM.ui.getContent(editor)},4000);
+//salert(UE.getEditor('editor').setContent("1111111111111111111"));
+
+//取内容用getPlainTxt(),不用getContent()，防止编辑器获得焦点
+</script>
+	
+</script>
+</html>

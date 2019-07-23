@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.StatisticsCustomerDayInfoDao">
+
+	<select id="queryObject" resultType="io.renren.entity.StatisticsCustomerDayInfoEntity">
+		select * from statistics_customer_day_info where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="io.renren.entity.StatisticsCustomerDayInfoEntity" parameterType="java.util.Map">
+		select t.*
+		,(SELECT u.name FROM sys_user u WHERE u.`user_id` = t.user_id ) userName
+		 from statistics_customer_day_info  t
+		where 1=1 
+		<if test="date != null">and  t.`date` = #{date}</if>
+		<if test="userId != null">and  t.`user_id` = #{userId}</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int" parameterType="java.util.Map">
+		select count(*) from statistics_customer_day_info 
+		where 1=1 
+		<if test="date != null">and  `date` = #{date}</if>
+		<if test="userId != null">and  `user_id` = #{userId}</if>
+	</select>
+	 
+	<insert id="save" parameterType="io.renren.entity.StatisticsCustomerDayInfoEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into statistics_customer_day_info
+		(
+			`user_id`, 
+			`date`, 
+			`task_count`, 
+			`new_create_count`, 
+			`success_count`, 
+			`follow_up_count`, 
+			`transaction_amount`, 
+			`create_time`, 
+			`last_update_time`
+		)
+		values
+		(
+			#{userId}, 
+			#{date}, 
+			#{taskCount}, 
+			#{newCreateCount}, 
+			#{successCount}, 
+			#{followUpCount}, 
+			#{transactionAmount}, 
+			#{createTime}, 
+			#{lastUpdateTime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="io.renren.entity.StatisticsCustomerDayInfoEntity">
+		update statistics_customer_day_info 
+		<set>
+			<if test="userId != null">`user_id` = #{userId}, </if>
+			<if test="date != null">`date` = #{date}, </if>
+			<if test="taskCount != null">`task_count` = #{taskCount}, </if>
+			<if test="newCreateCount != null">`new_create_count` = #{newCreateCount}, </if>
+			<if test="successCount != null">`success_count` = #{successCount}, </if>
+			<if test="followUpCount != null">`follow_up_count` = #{followUpCount}, </if>
+			<if test="transactionAmount != null">`transaction_amount` = #{transactionAmount}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="lastUpdateTime != null">`last_update_time` = #{lastUpdateTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from statistics_customer_day_info where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from statistics_customer_day_info where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	<insert id="statisticsCountCustomer" parameterType="java.util.Map">
+		 INSERT INTO  `statistics_customer_day_info` (
+		  
+		  `date`,
+		  `new_create_count`,
+		  `success_count`,
+		  `follow_up_count`,
+		  `transaction_amount`,
+		  `create_time`
+		) 
+		 SELECT  * FROM    
+		 (SELECT #{startTime} FROM DUAL ) t0,
+		 (
+		 SELECT COUNT(*) new_create_count FROM `customer_base_info` c WHERE c.create_time  BETWEEN #{startTime} AND  #{endTime}  
+		 ) t1 ,
+		 
+		 ( 
+		 SELECT COUNT(*) success_count FROM  `customer_hospital` ch WHERE ch.documentary_state = 60 AND ch.last_update_time   BETWEEN #{startTime} AND  #{endTime}    
+		 ) t2 ,
+		 
+		 (
+			SELECT COUNT(*) follow_up_count FROM  `customer_remark`  cr  WHERE   cr.create_time  BETWEEN #{startTime} AND  #{endTime}  
+		 ) t3 
+		  ,
+		  (SELECT 0 transaction_amount  FROM DUAL )  t4,
+		  
+		  (SELECT NOW() create_time  FROM DUAL )  t5
+		 	
+	</insert>
+	 
+	
+</mapper>

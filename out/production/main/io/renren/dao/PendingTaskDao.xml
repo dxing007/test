@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.PendingTaskDao">
+
+	<select id="queryObject" resultType="io.renren.entity.PendingTaskEntity">
+		select * from pending_task where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="io.renren.entity.PendingTaskEntity">
+		select pt.*,cb.name customerName,cb.telephone,cb.sex from pending_task  pt , `customer_base_info` cb   where pt.customer_id = cb.id
+		<if test="handlerUserId != null">
+			 and pt.handler_user_id = #{handlerUserId}
+		</if>
+		<if test="status != null">
+			 and pt.status = #{status}
+		</if>
+		<if test="task != null">
+			 <![CDATA[
+			 	and pt.next_follow_time <  NOW()
+			 ]]>
+		</if>
+		<if test="startTime != null">
+			 <![CDATA[
+			 	and pt.next_follow_time <  #{startTime}
+			 ]]>
+		</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from pending_task  pt , `customer_base_info` cb   where pt.customer_id = cb.id
+		<if test="handlerUserId != null">
+			 and pt.handler_user_id = #{handlerUserId}
+		</if>
+		<if test="status != null">
+			 and pt.status = #{status}
+		</if>
+		<if test="task != null">
+			 <![CDATA[
+			 	and pt.next_follow_time <  NOW() 
+			 	and pt.next_follow_time is not null
+			 ]]>
+		</if>
+		<if test="startTime != null">
+			 <![CDATA[
+			 	and pt.next_follow_time <  #{startTime}
+			 	and pt.next_follow_time is not null
+			 ]]>
+		</if>
+		
+	</select>
+	 
+	<insert id="save" parameterType="io.renren.entity.PendingTaskEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into pending_task
+		(
+			`customer_id`, 
+			`next_follow_time`, 
+			`last_follow_time`, 
+			`status`, 
+			`weight`, 
+			`create_time`, 
+			`create_user_id`, 
+			`last_update_time`, 
+			`last_update_user_id`,
+			`handler_user_id`
+		)
+		values
+		(
+			#{customerId}, 
+			#{nextFollowTime}, 
+			#{lastFollowTime}, 
+			#{status}, 
+			#{weight}, 
+			#{createTime}, 
+			#{createUserId}, 
+			#{lastUpdateTime}, 
+			#{lastUpdateUserId},
+			#{handlerUserId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="io.renren.entity.PendingTaskEntity">
+		update pending_task 
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="nextFollowTime != null">`next_follow_time` = #{nextFollowTime}, </if>
+			<if test="lastFollowTime != null">`last_follow_time` = #{lastFollowTime}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="weight != null">`weight` = #{weight}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="lastUpdateTime != null">`last_update_time` = #{lastUpdateTime}, </if>
+			<if test="lastUpdateUserId != null">`last_update_user_id` = #{lastUpdateUserId},</if>
+			<if test="handlerUserId != null">`handler_user_id` = #{handlerUserId}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from pending_task where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from pending_task where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	
+	<update id="updateStatus" parameterType="io.renren.entity.PendingTaskEntity">
+		update pending_task 
+		<set>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="lastUpdateTime != null">`last_update_time` = #{lastUpdateTime}, </if>
+			<if test="lastUpdateUserId != null">`last_update_user_id` = #{lastUpdateUserId},</if>
+			<if test="handlerUserId != null">`handler_user_id` = #{handlerUserId}</if>
+		</set>
+		where customer_id = #{customerId} and handler_user_id = #{handlerUserId} and status =#{oldStatus}
+	</update>
+	
+</mapper>

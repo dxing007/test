@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.CustomerBaseInfoDao">
+
+	<select id="queryObject" resultType="io.renren.entity.CustomerBaseInfoEntity">
+		SELECT c.*,s.`name` createName FROM customer_base_info c, sys_user s  WHERE c.`create_user_id` = s.`user_id` AND c.id =  #{value}
+	</select>
+
+	<select id="queryList" resultType="io.renren.entity.CustomerBaseInfoEntity"> 
+		SELECT c.*,ce.`beauty_item_code`, ce.last_update_time AS  exLastUpdateTime, s.`name` as createName 
+		FROM customer_base_info c  LEFT JOIN `customer_extend` ce ON c.`id` = ce.`customer_id` 
+			, sys_user s 
+		WHERE  s.`user_id` = c.`create_user_id`
+		
+		<if test="name != null and name.trim() != ''">
+			and	c.name like concat('%', #{name}, '%') 
+		</if>
+		<if test="status != null and status.trim() != ''">
+			and	c.status = status 
+		</if>
+		<if test="telephone != null and telephone.trim() != ''">
+			and	c.telephone  like concat('%', #{telephone}, '%') 
+		</if>
+		<if test="sex != null">
+			and	c.sex = sex 
+		</if>
+		<if test="qq != null">
+			and	c.qq like   concat('%', #{qq}, '%')  
+		</if>
+		
+		<if test="createUserId != null">
+			and	c.create_user_id = #{createUserId} 
+		</if>
+		<if test="hospitalAdminId != null">
+			AND c.id  IN (
+				  SELECT  customer_id FROM `customer_hospital` ch WHERE  ch.`hospital_admin_id` = #{hospitalAdminId}
+			)
+		</if>
+		<if test="startTime != null and endTime !=null">
+			 and c.create_time  BETWEEN #{startTime} AND  #{endTime}  
+		</if>
+		ORDER BY  c.create_time DESC 
+
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*)    
+		FROM customer_base_info c  LEFT JOIN `customer_extend` ce ON c.`id` = ce.`customer_id` 
+			, sys_user s 
+		WHERE  s.`user_id` = c.`create_user_id`
+		
+		<if test="name != null and name.trim() != ''">
+			and	c.name like concat('%', #{name}, '%') 
+		</if>
+		<if test="status != null and status.trim() != ''">
+			and	c.status = status 
+		</if>
+		<if test="telephone != null and telephone.trim() != ''">
+			and	c.telephone  like concat('%', #{telephone}, '%') 
+		</if>
+		<if test="sex != null">
+			and	c.sex = sex 
+		</if>
+		<if test="qq != null">
+			and	c.qq like   concat('%', #{qq}, '%')  
+		</if>
+		
+		<if test="createUserId != null">
+			and	c.create_user_id = #{createUserId} 
+		</if>
+		<if test="hospitalAdminId != null">
+			AND c.id  IN (
+				  SELECT  customer_id FROM `customer_hospital` ch WHERE  ch.`hospital_admin_id` = #{hospitalAdminId}
+			)
+		</if>
+		<if test="startTime != null and endTime !=null">
+			 and c.create_time  BETWEEN #{startTime} AND  #{endTime}  
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="io.renren.entity.CustomerBaseInfoEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into customer_base_info
+		(
+			`name`, 
+			`sex`, 
+			`telephone`, 
+			`status`, 
+			`telephone_contact`, 
+			`qq`, 
+			`qq_contact`, 
+			`email`, 
+			`email_contact`, 
+			`weChat`, 
+			`weChat_contact`, 
+			`microblog`, 
+			`microblog_contact`, 
+			`located_region_code`, 
+			`create_time`, 
+			`create_user_id`, 
+			`last_update_time`, 
+			`last_update_user_id`
+		)
+		values
+		(
+			#{name}, 
+			#{sex}, 
+			#{telephone}, 
+			#{status}, 
+			#{telephoneContact}, 
+			#{qq}, 
+			#{qqContact}, 
+			#{email}, 
+			#{emailContact}, 
+			#{wechat}, 
+			#{wechatContact}, 
+			#{microblog}, 
+			#{microblogContact}, 
+			#{locatedRegionCode}, 
+			#{createTime}, 
+			#{createUserId}, 
+			#{lastUpdateTime}, 
+			#{lastUpdateUserId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="io.renren.entity.CustomerBaseInfoEntity">
+		update customer_base_info 
+		<set>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="sex != null">`sex` = #{sex}, </if>
+			<if test="telephone != null">`telephone` = #{telephone}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="telephoneContact != null">`telephone_contact` = #{telephoneContact}, </if>
+			<if test="qq != null">`qq` = #{qq}, </if>
+			<if test="qqContact != null">`qq_contact` = #{qqContact}, </if>
+			<if test="email != null">`email` = #{email}, </if>
+			<if test="emailContact != null">`email_contact` = #{emailContact}, </if>
+			<if test="wechat != null">`weChat` = #{wechat}, </if>
+			<if test="wechatContact != null">`weChat_contact` = #{wechatContact}, </if>
+			<if test="microblog != null">`microblog` = #{microblog}, </if>
+			<if test="microblogContact != null">`microblog_contact` = #{microblogContact}, </if>
+			<if test="locatedRegionCode != null">`located_region_code` = #{locatedRegionCode}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="lastUpdateTime != null">`last_update_time` = #{lastUpdateTime}, </if>
+			<if test="lastUpdateUserId != null">`last_update_user_id` = #{lastUpdateUserId}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from customer_base_info where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from customer_base_info where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

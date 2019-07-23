@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+ 
+#parse("sys/header.html")
+<!-- 
+<link rel="stylesheet" href="${rc.contextPath}/statics/css/iview.css">
+<script src="${rc.contextPath}/statics/libs/vue.min.js"></script>  
+<script src="${rc.contextPath}/statics/libs/iview.min.js"></script> 
+ -->
+</head>
+<body>
+ 
+<div id="rrapp" v-cloak>
+	<!-- 派单信息 -->
+	#parse("sys/customer_extend.html") 
+</div>
+ 
+<!--   <script src="${rc.contextPath}/js/sys/customerbaseinfo.js?_${date.systemTime}"></script>    
+ -->
+  
+  <script src="${rc.contextPath}/js/sys/extend/customer/editCustomer.js?_${date.systemTime}"></script>
+</body>
+  
+</html>

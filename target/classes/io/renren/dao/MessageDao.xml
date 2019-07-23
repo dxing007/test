@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.MessageDao">
+
+	<select id="queryObject" resultType="io.renren.entity.MessageEntity">
+		select * from message where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="io.renren.entity.MessageEntity">
+		SELECT m.*,  cb.`name` customerName,
+		(SELECT `name` FROM sys_user s1 WHERE s1.user_id = m.`receive_id` ) AS  receiveName , 
+		(SELECT `name` FROM sys_user s2 WHERE s2.user_id = m.`sender_id` ) AS   senderName
+		 FROM message m   , `customer_base_info` cb 
+		 WHERE  m.`customer_id` = cb.`id` 
+		<if test="customerId != null">
+			and m.customer_id = #{customerId}
+		</if>
+		<if test="receiveId != null">
+			and (m.receive_id = #{receiveId} or  m.sender_id = #{receiveId})
+		</if>
+		<if test="myself != null">
+			and m.receive_id = #{myself}  
+		</if>
+		<if test="status != null">
+			and m.status = #{status}  
+		</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from message 
+	</select>
+	 
+	<insert id="save" parameterType="io.renren.entity.MessageEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into message
+		(
+			`customer_id`, 
+			`status`, 
+			`content`, 
+			`sender_id`, 
+			`receive_id`, 
+			`create_time`, 
+			`create_user_id`, 
+			`last_update_time`, 
+			`last_update_user_id`
+		)
+		values
+		(
+			#{customerId}, 
+			#{status}, 
+			#{content}, 
+			#{senderId}, 
+			#{receiveId}, 
+			#{createTime}, 
+			#{createUserId}, 
+			#{lastUpdateTime}, 
+			#{lastUpdateUserId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="io.renren.entity.MessageEntity">
+		update message 
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="senderId != null">`sender_id` = #{senderId}, </if>
+			<if test="receiveId != null">`receive_id` = #{receiveId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="lastUpdateTime != null">`last_update_time` = #{lastUpdateTime}, </if>
+			<if test="lastUpdateUserId != null">`last_update_user_id` = #{lastUpdateUserId}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from message where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from message where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>客户派单表</title>
+#parse("sys/header.html")
+
+<link href="${rc.contextPath}/statics/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="${rc.contextPath}/statics/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+<script type="text/javascript" src="${rc.contextPath}/statics/plugins/datetimepicker/js/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			 <div class="row">
+				<div class="col-xs-3"> 
+					<label class="col-sm-2 control-label"  style="top: 8px;">开始时间</label>
+					<input  class="form-control" style="width: 70%"  
+			name="tradeTime" id="beginTime" size="12" type="text" placeholder="开始时间"
+			data-date-format="yyyy-mm-dd HH:mm:SS"/>
+					 
+				</div>
+				<div class="col-xs-3"> 
+					<label class="col-sm-2 control-label"  style="top: 8px;">结束时间</label>
+					<input  class="form-control" style="width: 70%" 
+			name="tradeTime" id="endTime" size="12" type="text" placeholder="结束时间"
+			data-date-format="yyyy-mm-dd HH:mm:SS"/>
+				</div>
+				<div class="col-xs-3">
+				    <label class="col-sm-2 control-label"   style="top: 8px">地区</label>
+					 <select v-model="q.regionCode" id="bak_province"  
+							 class="form-control" style="width: 70%">
+						 <option  v-for="item in provinceList"  :value="item.code" :key="item.code" >{{item.names}}</option>
+					 </select>
+				</div>
+				<a class="btn btn-default" @click="query">查询</a>  
+			</div>	
+<!-- 			#if($shiro.hasPermission("customerhospital:save")) -->
+<!-- 			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a> -->
+<!-- 			#end -->
+<!-- 			#if($shiro.hasPermission("customerhospital:update")) -->
+<!-- 			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+<!-- 			#end -->
+<!-- 			#if($shiro.hasPermission("customerhospital:delete")) -->
+<!-- 			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+<!-- 			#end -->
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+			 <div class="form-group">
+			   	<div class="col-sm-2 control-label">客户id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerHospital.customerId" placeholder="客户id"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">医院id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerHospital.hospitalId" placeholder="医院id"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">跟单状态</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerHospital.documentaryState" placeholder="跟单状态"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">分配人id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerHospital.distributionUserId" placeholder="分配人id"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerHospital.createTime" placeholder=""/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerHospital.createUserId" placeholder=""/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerHospital.lastUpdateTime" placeholder=""/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerHospital.lastUpdateUserId" placeholder=""/>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/hospitalManage.js?_${date.systemTime}"></script>
+</body>
+</html>

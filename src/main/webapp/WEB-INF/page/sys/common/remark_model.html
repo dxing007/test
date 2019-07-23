@@ -1,0 +1,155 @@
+<html>
+<head>
+	
+</head>
+ <title>layui在线调试</title>
+  <link rel="stylesheet" href="../statics/plugins/layui2.0/css/layui.css?t=1525771196163"  >
+<body>
+  
+			 <!-- 模态框（Modal） -->
+					<div class="modal fade" id="myModal"   tabindex="-1" role="dialog"
+						aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-dialog"  style="width: 60%;height: 450px;">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal"
+										aria-hidden="true">&times;</button>
+									<h4 class="modal-title" id="myModalLabel">跟进备注及历史详情</h4>
+								</div>
+								<div class="modal-body" > 
+									  <form class="layui-form" action="">
+									     <div class="layui-form-item">
+											    <div class="layui-inline">
+												    	<label class="layui-form-label">权重</label>
+													    <div class="layui-input-inline">
+													         <select name="weight" id="weightId" lay-verify="required">
+															        <option value=""></option>
+															      	<option value="">--请选择--</option>
+																  	<option  v-for="item in  cacheInfo.remark_weight"  :value="item.dictItemValue" :key="item.dictItemValue" >{{item.dictItemName}}</option>
+													        </select>
+													    </div>
+											    </div>
+											    <div class="layui-inline">
+											    	  <label   class="layui-form-label" style="width: 120px;">下次跟进日期</label>
+											           <div class="layui-input-inline">
+											          		<input type="text" name="nextFollowTime"  class="layui-input" id="nextFollowTime">
+											          </div>
+											    </div>
+											    <div class="layui-inline">
+											     	<label class="layui-form-label">不跟进</label>
+											       	<div class="layui-input-inline">
+											        	<input type="checkbox" id="isFollowId" lay-filter="switchTest" value="1" name="isFollow" lay-skin="switch">  
+											        </div>
+											    </div>
+										  </div>
+								 
+								   <div class="layui-form-item layui-form-text">
+									    <label class="layui-form-label" style="width: 100px;">当前情况</label>
+									    <div class="layui-input-block">
+									      <textarea placeholder="请输入内容" v-model="customerRemark.currentRemark" class="layui-textarea" name="desc"></textarea>
+									    </div>
+									  </div>
+								 
+								   <div class="layui-form-item layui-form-text">
+									    <label class="layui-form-label"  style="width: 100px;">下次情况</label>
+									    <div class="layui-input-block">
+									      <textarea placeholder="请输入内容" v-model="customerRemark.nextRemark" class="layui-textarea"  ></textarea>
+									    </div>
+									  </div>
+				 </form>	
+				 <table id="demo" lay-filter="test"></table>
+<!-- 					 <div id="selecthosList" class="ztree" style="height:480px;overflow:auto; ">    -->
+<!-- 						<table id="jqGrid"></table> -->
+<!-- 						<div id="jqGridPager"></div> -->
+<!-- 					</div> -->
+				</div>
+				    
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+					</button>
+					<button type="button" @click="saveRemark" class="btn btn-primary">提交更改</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+	</div>	
+		<!-- /.modal -->
+    
+<!--     <div class="layui-inline"> 注意：这一层元素并不是必须的 -->
+<!--   			<input type="text" class="layui-input" id="test1"> -->
+<!-- 	</div> -->
+<script src="../statics/plugins/layui2.0/layui.js"></script> 
+<script>
+//Demo
+layui.use('form', function(){
+  var form = layui.form;
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    layer.msg(JSON.stringify(data.field));
+    return false;
+  });
+  
+  layui.use('laydate', function(){
+	  var laydate = layui.laydate;
+	  
+	  //执行一个laydate实例
+	  laydate.render({
+	    elem: '#nextFollowTime' //指定元素
+	  });
+	});
+  
+  //监听指定开关
+  form.on('switch(switchTest)', function(data){
+    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });
+    layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+  });
+  
+  
+});
+
+layui.use('table', function(){
+	var table = layui.table;
+	//第一个实例
+	table.render({
+	  elem: '#demo'
+	  ,height: 315
+	  ,url: '../customerremark/allList' //数据接口
+	  ,page: false //开启分页
+	  ,request: {
+		  pageName: 'page' //页码的参数名称，默认：page
+		  ,limitName: 'limit' //每页数据量的参数名，默认：limit
+	  }
+	  ,response: {
+		 	   statusName: 'code' //数据状态的字段名称，默认：code
+			  ,statusCode: 0 //成功的状态码，默认：0
+			  ,msgName: 'msg' //状态信息的字段名称，默认：msg
+			  ,countName: 'page.totalPage' //数据总数的字段名称，默认：count
+			  ,dataName: 'list' //数据列表的字段名称，默认：data
+	 }
+	 ,done: function(res, curr, count){
+		  	console.log(123); 
+		  	 console.log(table);
+		    //如果是异步请求数据方式，res即为你接口返回的信息。
+		    //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+		    console.log(res);
+		  	//table.data = res.page.list;
+		    //得到当前页码
+		    console.log(curr); 
+		    
+		    //得到数据总量
+		    console.log(count);
+		  }
+	  ,cols: [[ //表头
+	    {field: 'createTime', title: '创建时间',width:180}
+	    ,{field: 'currentRemark', title: '当前情况', width:250}
+	    ,{field: 'lastUpdateTime', title: '下次联系时间', width: 180}
+	    ,{field: 'nextRemark', title: '下次情况', width:318} 
+	  ]]
+	});
+});
+</script>
+ 
+</body>
+</html>

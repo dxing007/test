@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>监控管理</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	
+	#parse("sys/common/customerBaseInfoModel.html")
+	
+	#parse("sys/common/changeStateModel.html")
+	<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">顾客基础信息
+				<button type="button" style="float:right;padding-top: 0px;padding:2px 16px;margin-right: 6px;" @click="returnMonitorList" class="btn btn-default">返回列表</button> 
+				 
+				 #if($shiro.hasPermission("customer:baseUpdate"))
+					<button  type="button"  style="float:right;padding-top: 0px;padding:2px 16px;margin-right: 6px;" @click="toUpdateBaseInfo" class="btn btn-default">修改</button> 
+				 #end
+				
+				</div>
+				<div class="panel-body">
+						 <div class="row" style="border-top:0">
+							  <div class="col-md-4">顾客姓名: &nbsp;{{customerBaseInfo.name}}</div>
+							  <div class="col-md-4">性别 :&nbsp; {{customerBaseInfo.sex ==1 ? '男':'女'}}</div>
+							   <div class="col-md-4">手机: &nbsp; {{customerBaseInfo.telephone}}</div>
+						 </div>
+						  <div class="row" style="border-top:0">
+							  <div class="col-md-4">所在地区:&nbsp;{{customerBaseInfo.showLocatedRegionCode}}</div>
+							  <div class="col-md-4">QQ:&nbsp;{{customerBaseInfo.qq}}</div>
+							  <div class="col-md-4">邮箱:&nbsp;{{customerBaseInfo.email}}</div>
+						 </div>
+						  <div class="row" style="border-top:0">
+							  <div class="col-md-4">微信:&nbsp;{{customerBaseInfo.wechat}}</div>
+							  <div class="col-md-4">微博: {{customerBaseInfo.microblog}}</div>
+ 							  <div class="col-md-4">派单人员: {{customerBaseInfo.createName}}</div> 
+						  </div>
+						   #if($shiro.hasPermission("customer:addRemark"))
+							   <div class="row" style="border-top:0">
+								  <div class="col-md-4">跟单备注:&nbsp;<a  class="btn btn-default" @click="showRemark" >&nbsp;修改跟单备注信息</a></div>
+							  </div>
+						   #end
+				</div>
+			</div>
+			
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">派单信息 </div>
+				<div class="panel-body">
+						 <div class="row" style="border-top:0">
+							  <div class="col-md-3">派单时间: &nbsp;{{customerExtendInfo.createTime}}</div>
+							  <div class="col-md-3">派单项目 :&nbsp; {{getCacheTypeName('plastic_project',customerExtendInfo.beautyItemCode)}}</div>
+							  <div class="col-md-3">第一意向地: &nbsp; {{customerExtendInfo.showIntentionAreaCode}}</div>
+							  <div class="col-md-3">顾客来源: &nbsp; {{customerExtendInfo.infoSource}}</div>
+						 </div>
+						  <div class="row" style="border-top:0">
+							  <div class="col-md-12">派单说明:&nbsp;
+							  		<div v-html="customerExtendInfo.describe"></div> 
+							   </div>
+						 </div>
+				</div>
+			</div>
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">顾客跟进信息,记得修改跟进状态哦！  
+				  </div>
+				<div class="panel-body">
+					
+
+					<div class="panel panel-default" v-for="item in hospitalList" >
+					    <div class="panel-body">
+					       		<h4>{{item.hopitalName}}
+					       			 #if($shiro.hasPermission("customer:tochangeStateModel"))
+					       				<button type="button" style="float:right;padding-top: 0px;padding:2px 16px;" @click="tochangeStateModel(item.id,item.documentaryState,item.earnestMoney,item.turnoverAmount)" class="btn btn-default">修改跟进状态</button> 
+					    			 #end
+					    		</h4>
+					    </div>
+					    <div class="panel-footer"> 
+						 	<div class="row" style="border-top:0">
+									<div class="progress">
+										<div class="progress-bar progress-bar-success" role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 10%;">
+											 录入
+										</div>
+										
+										<div v-if="item.documentaryState>=20"   class="progress-bar progress-bar-success" role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 20%;">
+											已派单
+										</div>
+										<div v-else  class="progress-bar progress-bar-noWork" role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 20%;">
+											已派单
+										</div>
+										
+										
+										<div v-if="item.documentaryState>=30" class="progress-bar progress-bar-success" role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 20%;">
+											 已跟进
+										</div>
+										<div v-else class="progress-bar progress-bar-noWork" role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 20%;">
+											 已跟进
+										</div>
+										
+										<div v-if="item.documentaryState>=35"  class="progress-bar progress-bar-success" role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 10%;">
+											 已预约
+										</div>
+										<div v-else class="progress-bar progress-bar-noWork" role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 10%;">
+											 已预约
+										</div>
+										
+										<div v-if="item.documentaryState>=40"  class="progress-bar progress-bar-success" role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 10%;">
+											 已上门
+										</div>
+										<div v-else class="progress-bar progress-bar-noWork" role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 10%;">
+											 已上门
+										</div>
+										
+										
+										<div v-if="item.documentaryState>=50" class="progress-bar progress-bar-success" role="progressbar"
+											 aria-valuenow="60"  aria-valuemin="0" aria-valuemax="100"
+											 style="width: 20%;">
+											 交定金
+										</div>
+										<div v-else class="progress-bar progress-bar-noWork" role="progressbar"
+											 aria-valuenow="60"  aria-valuemin="0" aria-valuemax="100"
+											 style="width: 20%;">
+											 交定金
+										</div>
+										
+										<div v-if="item.documentaryState>=60" class="progress-bar progress-bar-success"    role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 10%;">
+											  已成交
+										</div>
+										<div v-else class="progress-bar progress-bar-noWork"    role="progressbar"
+											 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+											 style="width: 10%;">
+											  已成交
+										</div>
+									</div>
+						 </div>
+						 <div class="row" style="border-top:0" v-if="item.documentaryState>=50" >
+											  <div class="col-md-3" v-if="item.documentaryState>=50" >定金金额: &nbsp;{{item.earnestMoney}}元</div>
+											  <div class="col-md-3" v-if="item.documentaryState>=60">成交金额 :&nbsp;{{item.turnoverAmount}}元</div>
+						 </div>
+						 
+<!-- 					  :style="{'float:right'mes_index%2 != 1}" -->
+						 <div  class="row" style="border-top:0;padding-top: 0px;"  v-for="(message,mes_index) in item.messageList" >
+							   <h5   v-if="mes_index%2 != 0"  class="active" ><small>{{message.createTime}}</small>: {{message.senderName}}</h5>
+							   <h5 v-if="mes_index%2 != 1"  >{{message.senderName}}: <small>{{message.createTime}}</small></h5>
+							   <div class="col-md-12" v-if="mes_index%2 != 1"> 
+							   		 <div class="alert alert-success" style="float:left;margin-top:8px; ">   {{message.content}}</div>
+							   </div>
+							   
+							   <div class="col-md-12" v-if="mes_index%2!= 0"> 
+							   		 <div class="alert alert-success" style="float:right;margin-top:8px;"> {{message.content}}</div>
+							   </div>
+						 </div>
+						 
+						 <div class="row" style="border-top:0;">
+							   <div class="col-md-6"> 
+							   		 <textarea maxlength="500" class="form-control"  v-model="item.message" rows="3"></textarea>
+							   </div>
+							     <div class="col-md-3" style="padding-top: 40px;padding-left: 0px;"> 
+							   		
+							   		  #if($shiro.hasPermission("message:save"))
+							   			<button type="submit" v-if="userType!='hospital_admin'"  @click="sendMessage(item.message,item.hospitalAdminId,'task')" class="btn btn-default">发送</button>
+							   		 	<button type="submit"  v-if="userType=='hospital_admin'"  @click="sendMessage(item.message,item.distributionUserId,'task')" class="btn btn-default">发送</button>
+							   		 #end	
+							   </div>
+						 </div>
+						</div>
+			       </div>
+			       
+			       
+			  </div>
+		  </div>			
+			
+		</div>
+</div>
+<script src="${rc.contextPath}/js/sys/customer_detail.js?v=_${date.systemTime}"></script>
+</body>
+<style type="text/css">
+	.progress-bar-yellow {
+	    background-color: pink;
+	}
+	.progress-bar-noWork {
+	    background-color: #C0C0C0;
+	}
+	.active{
+		float:right
+	}
+	
+</style>
+<script >
+	
+</script>
+</html>

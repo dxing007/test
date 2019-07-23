@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>客户基础信息表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+		
+			<div class="col-xs-3"> 
+				<label class="col-sm-2 control-label"  style="top: 8px;">名称</label>
+				<input   type="text"  v-model="q.name"  @keyup.enter="query"  style="width: 70%" class="form-control" placeholder="请输入名称">
+			</div>
+			<div class="col-xs-3">
+			    <label class="col-sm-2 control-label"  style="top: 8px;">手机号</label>
+				<input type="text"  v-model="q.telephone"  @keyup.enter="query" style="width: 70%" class="form-control" placeholder="手机号">
+			</div>
+			<div class="col-xs-3">
+			    <label class="col-sm-2 control-label"  style="top: 8px;">QQ</label>
+				<input type="text"  v-model="q.qq"  @keyup.enter="query" style="width: 70%" class="form-control" placeholder="QQ">
+			</div>
+			<a class="btn btn-default" @click="query">查询</a>
+<!-- 			#if($shiro.hasPermission("sys:user:save")) -->
+<!-- 			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a> -->
+<!-- 			#end -->
+<!-- 			#if($shiro.hasPermission("sys:user:update")) -->
+<!-- 			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+<!-- 			#end -->
+<!-- 			#if($shiro.hasPermission("sys:user:delete")) -->
+<!-- 			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+<!-- 			#end -->
+		
+<!-- 			#if($shiro.hasPermission("customerbaseinfo:save")) -->
+<!-- 			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a> -->
+<!-- 			#end -->
+<!-- 			#if($shiro.hasPermission("customerbaseinfo:update")) -->
+<!-- 			#end -->
+ 			#if($shiro.hasPermission("customerbaseinfo:delete")) 
+ 			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>  
+ 			#end 
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+											<div class="form-group">
+			   	<div class="col-sm-2 control-label">名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.name" placeholder="名称"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">性别 0 为女  1 为男</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.sex" placeholder="性别 0 为女  1 为男"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">电话号码</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.telephone" placeholder="电话号码"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">客户主状态（跟单人员关心）</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.status" placeholder="客户主状态（跟单人员关心）"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否充许电话联  0 充许 1 不能</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.telephoneContact" placeholder="是否充许电话联  0 充许 1 不能"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">QQ</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.qq" placeholder="QQ"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否充许QQ联  0 充许 1 不能</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.qqContact" placeholder="是否充许QQ联  0 充许 1 不能"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">邮箱</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.email" placeholder="邮箱"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否充许联系</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.emailContact" placeholder="是否充许联系"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">微信</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.wechat" placeholder="微信"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否充许联系</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.wechatContact" placeholder="是否充许联系"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">微博</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.microblog" placeholder="微博"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否充许联系</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.microblogContact" placeholder="是否充许联系"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">地区编码</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.locatedRegionCode" placeholder="地区编码"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">创建人</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.createTime" placeholder="创建人"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">创建人</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.createUserId" placeholder="创建人"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">更新时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.lastUpdateTime" placeholder="更新时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">更新人</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerBaseInfo.lastUpdateUserId" placeholder="更新人"/>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/customerbaseinfo.js?_${date.systemTime}"></script>
+<script >
+$(function () {
+	queryCache();
+	
+	$("#jqGrid").jqGrid({
+        url: '../customerbaseinfo/list',
+        datatype: "json",
+        colModel: [			
+//			{ label: 'id', name: 'id', width: 50, key: true },
+			{ label: '名称', name: 'name', width: 80 }, 			
+//			{ label: '性别 0 为女  1 为男', name: 'sex', width: 80 }, 	
+			{ label: '性别', name: 'sex', width: 25, formatter: function(value, options, row){
+				return value === 0 ? 
+					'女' : 
+					'男';
+			}},
+			{ label: '电话号码', name: 'telephone', width: 100 }, 			
+//			{ label: '客户主状态（跟单人员关心）', name: 'status', width: 80 }, 			
+			{ label: 'QQ', name: 'qq', width: 50 }, 			
+//			{ label: '是否充许QQ联  0 充许 1 不能', name: 'qqContact', width: 80 }, 			
+// 			{ label: '邮箱', name: 'email', width: 100 }, 			
+//			{ label: '是否充许联系', name: 'emailContact', width: 80 }, 			
+// 			{ label: '微信', name: 'wechat', width: 80 }, 			
+//			{ label: '是否充许联系', name: 'wechatContact', width: 80 }, 			
+// 			{ label: '微博', name: 'microblog', width: 80 }, 			
+//			{ label: '是否充许联系', name: 'microblogContact', width: 80 }, 			
+			{ label: '地区编码', name: 'locatedRegionCode', width: 50, formatter: function(value, options, row){
+				return  getCityShowName(value);
+			}},		
+			{ label: '创建时间', name: 'createTime', width: 80, formatter: function(value, options, row){
+				return  crtTimeFtt(value);
+			}},
+			//{ label: '创建时间', name: 'createTime', width: 100 },  //fmDate(			
+			{ label: '项目', name: 'beautyItemCode', width: 80,
+				 formatter: function(value, options, row){
+						return  getCacheTypeName('plastic_project',value);
+				 }		
+			},
+			{ label: '创建人', name: 'createName', width: 60 }, 	
+			{ label: '更新时间', name: 'exLastUpdateTime', width: 50, formatter: function(value, options, row){
+				return  fmDate(value);
+			}},
+ 			//{ label: '更新时间', name: 'exLastUpdateTime', width: 80 },		
+ 			{ label: '操作', name: 'id', width: 120 ,
+				formatter: function(value, options, row){
+					return  '<a class="btn btn-primary" style="margin-right: 6px;"  href="customer_detail.html?id='+value+'&type=customerbaseinfo" >&nbsp;&nbsp;详情</a>'
+					#if($shiro.hasPermission("sys:paidan"))  
+						+'<a class="btn btn-primary" style="margin-right: 6px;" href="editCustomerInfo.html?customerId='+value+'" >&nbsp;派单</a>'
+					#end  		
+					;
+			 }}		
+        ],
+		viewrecords: true,
+        height: 385,
+        rowNum: 10,
+		rowList : [10,30,50],
+        rownumbers: true, 
+        rownumWidth: 25, 
+        autowidth:true,
+        multiselect: true,
+        pager: "#jqGridPager",
+        jsonReader : {
+            root: "page.list",
+            page: "page.currPage",
+            total: "page.totalPage",
+            records: "page.totalCount"
+        },
+        prmNames : {
+            page:"page", 
+            rows:"limit", 
+            order: "order"
+        },
+        gridComplete:function(){
+        	//隐藏grid底部滚动条
+        	$("#jqGrid").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" }); 
+        }
+    });
+});
+
+
+
+
+	
+</script>
+
+</body>
+</html>

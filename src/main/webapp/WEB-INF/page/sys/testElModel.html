@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- import CSS -->
+   <link rel="stylesheet" href="${rc.contextPath}/statics/plugins/elementui/index.css">
+</head>
+<body>
+  <div id="app" v-cloak>
+<!--  			<el-button type="text" @click="dialogVisible = true">点击打开 Dialog</el-button>  -->
+
+<!-- 			<el-dialog -->
+<!-- 			  title="提示" -->
+<!-- 			  :visible.sync="dialogVisible" -->
+<!-- 			  width="60%" -->
+<!-- 			  :before-close="handleClose"> -->
+ <el-card class="box-card">
+  	<div slot="header" class="clearfix">
+    <span>跟进备注及历史详情</span>	   
+	</div>
+					  
+	  <el-form ref="form"   :model="form" label-width="120px">
+		  <el-form-item label="权重"    prop="weight" :rules="[{ required: true, message: '权重不能为空'} ]"  > 
+		     <el-select v-model="form.weight" placeholder="请选择权重">
+		      <el-option   v-for="item in  cacheInfo.remark_weight"  :label="item.dictItemName" :value="item.dictItemValue"></el-option>
+		    </el-select>
+		  </el-form-item>
+		  <el-form-item label="下次跟进日期">
+		  		<el-col :span="8">
+		   			 <el-date-picker type="date" default-time="12:00:00"   :picker-options="pickerOptions1" placeholder="选择日期" @click="toUpdaeData" v-model="form.nextFollowTime"  :disabled="form.follow"  ></el-date-picker>	
+		   		</el-col>
+		   		 <el-col :span="2">
+		   		 		不跟进
+		   			 <el-switch v-model="form.follow" @change="changeSwitch" ></el-switch>
+		   		</el-col>
+		  </el-form-item>
+		  <el-form-item label="当前情况">
+		    <el-input type="textarea" v-model="form.currentRemark"></el-input>
+		  </el-form-item>
+		  
+		  <el-form-item label="下次情况">
+		    <el-input type="textarea" v-model="form.nextRemark"></el-input>
+		  </el-form-item>
+		  <el-form-item>
+		    <el-button type="primary" @click="onSubmit">保存</el-button>
+		    <!-- 	<a class="btn btn-primary" href="testElModel.html" >返回</a> -->
+		    <el-button @click="returnDetail" >取消</el-button>
+		  </el-form-item>
+		</el-form>
+			 
+			 <el-table
+			      :data="tableData"
+			      style="width: 100%">
+			      <el-table-column  prop="showWeight"   label="权重"   width="150">    </el-table-column>
+			      <el-table-column  prop="createTime"  label="创建时间"   width="200"> </el-table-column>
+			      <el-table-column prop="nextTime"  label="下次联系时间"   width="200"> </el-table-column>
+			      <el-table-column  prop="currentRemark"  label="当前情况"   width="510"> </el-table-column>
+			      <el-table-column  prop="nextRemark"  label="下次情况"   width="500"> </el-table-column>
+			 </el-table>
+			  
+<!-- 			  <span slot="footer" class="dialog-footer"> -->
+<!-- 			  	<a class="btn btn-primary" href="testElModel.html" >返回</a> -->
+<!-- 			    <el-button @click="dialogVisible = false">返回</el-button> -->
+<!-- 			    <el-button type="primary" @click="dialogVisible = false">确 定</el-button> -->
+<!-- 			  </span> -->
+		 </el-card>
+<!-- 			</el-dialog> -->
+						
+  </div>
+</body>
+  <!-- import Vue before Element -->
+
+<script src="${rc.contextPath}/statics/libs/jquery.min.js"></script>
+  <script src="${rc.contextPath}/statics/libs/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="${rc.contextPath}/statics/libs/elm_ui_index.js"></script>
+ 
+  <script>
+  function fun_date(aa){
+	    var date1 = new Date(),
+	     time1=date1.getFullYear()+"-"+(date1.getMonth()+1)+"-"+date1.getDate();//time1表示当前时间
+	    var date2 = new Date(date1);
+	    date2.setDate(date1.getDate()+aa);
+	    var time2 = date2.getFullYear()+"-"+(date2.getMonth()+1)+"-"+date2.getDate() +" 00:00:00";
+	    return time2;
+  }
+//从地址或取参数
+  function GetQueryString(name) {
+  	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+  	var r = window.location.search.substr(1).match(reg);
+  	if (r != null)
+  		return unescape(r[2]);
+  	return null;
+  }
+  
+  $(function () {
+	  //el.init(); 
+
+  var el = new Vue({
+      el: '#app',
+      mounted: function() {
+          var el = this;
+          setTimeout(function(){
+				 el.init();
+    	  },100);
+      },
+      data: function() {
+        return { 
+        	visible: true,
+        	dialogVisible:false,
+            form: {
+            	follow:false
+            },
+            dataVisible:false,
+            cacheInfo:{},
+            tableData:[],
+            pickerOptions1: {
+                shortcuts: [{
+                  text: '一周后',
+                  onClick(picker) {
+                	  const date = new Date();
+                      date.setTime(date.getTime() + 3600 * 1000 * 24 *7);
+                      picker.$emit('pick', date);
+                  }
+                }, {
+                  text: '二周后',
+                  onClick(picker) {
+                    const date = new Date();
+                    date.setTime(date.getTime() + 3600 * 1000 * 24 * 14);
+                    picker.$emit('pick', date);
+                  }
+                }, {
+                  text: '一月后',
+                  onClick(picker) {
+                    const date = new Date();
+                    date.setTime(date.getTime() + 3600 * 1000 * 24 * 30);
+                    picker.$emit('pick', date);
+                  }
+                }]
+              },
+		}
+        
+      },
+      
+      methods: {
+    	init: function (){
+    		el.queryCache();
+    		el.form.customerId = GetQueryString("id");
+    		// el.form.nextFollowTime = new Date(fun_date(7));
+    		console.log("TTTTTTT",el.form.nextFollowTime);
+    		el.queryRemarkList();
+    	},
+    	handleClose: function () {
+    		  el.dialogVisible = false;
+  		},
+  		onSubmit:function(){
+  			console.log(this.$refs['form']);
+  			if(el.form.follow==false){
+  				el.form.isFollow = 1 ;
+  			}else {
+  				el.form.isFollow = 0;
+  			}
+  			//表单验证方法
+// 			try{
+// 				 var  flag = this.$refs['form'].validate();
+// 				 console.log(666666666);
+// 	  			 console.log(flag);
+// 			}	 catch(error) {
+// 				 console.log("出错了");
+// 				 console.log(error);
+// 			}		 
+//   			return ;  
+  			$.ajax({
+				type: "POST",
+			    url: "../customerremark/save",
+			    data:JSON.stringify(el.form),
+			    dataType: 'json',contentType:'application/json;charset=UTF-8',   
+			    success: function(r){
+			    	console.log(r);
+			    	el.$message({
+			            message: '保存成功',
+			            type: 'success'
+			          });
+			    	//返回详情
+			    	el.returnDetail();
+				}
+			});
+  		},
+  		changeSwitch:function(){
+  			if(el.form.follow==true){
+  				el.form.nextFollowTime = '';
+  			}
+  		},
+  		queryCache : function (){
+			$.ajax({
+				type: "POST",
+			    url: "../basedict/queryBaseDictMapByCodes",
+			    data:JSON.stringify( ["user_type","remark_weight"]),
+			    dataType: 'json',contentType:'application/json;charset=UTF-8',   
+			    success: function(r){
+			    	console.log(r);
+			    	el.cacheInfo = r ;
+				}
+			});
+		},
+		queryRemarkList:function(){
+			$.ajax({
+				type: "POST",
+			    url: "../customerremark/allList?page=1&limit=100",
+			    dataType: 'json',contentType:'application/json;charset=UTF-8',   
+			    success: function(r){
+			    	el.tableData = [];
+			    	for(var v in r.list){
+			    		r.list[v].showWeight= el.getCacheTypeName('remark_weight',r.list[v].weight);
+			    		if(r.list[v].isfollow == '1'){
+			    			r.list[v].nextTime = '不跟进'
+			    		}else{
+			    			r.list[v].nextTime = r.list[v].nextFollowTime;
+			    		}
+			    		el.tableData.push(r.list[v]);
+			    	}
+				}
+			});
+		},
+		returnDetail: function(){
+			self.location='customer_detail.html?id='+el.form.customerId; 
+		}
+		,getCacheTypeName:function(type,value){
+			   if(value){
+				   for(var k in el.cacheInfo[type]){
+					   if(el.cacheInfo[type][k].dictItemValue == value){
+						   return el.cacheInfo[type][k].dictItemName ;
+					   }
+				   }
+			   }
+			   return value;
+		},
+		toUpdaeData: function(){
+			this.$forceUpdate();
+		}
+  		
+      }	
+     
+    })
+  });
+  </script>
+</html>

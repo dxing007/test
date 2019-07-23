@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- import CSS -->
+  <link rel="stylesheet" href="${rc.contextPath}/statics/plugins/elementui/index.css">
+</head>
+<body>
+  <div id="app" v-cloak>
+<!--  			<el-button type="text" @click="dialogVisible = true">点击打开 Dialog</el-button>  -->
+
+<!-- 			<el-dialog -->
+<!-- 			  title="提示" -->
+<!-- 			  :visible.sync="dialogVisible" -->
+<!-- 			  width="60%" -->
+<!-- 			  :before-close="handleClose"> -->
+ <el-card class="box-card">
+  	<div slot="header" class="clearfix">
+    <span>新增顾客</span>	   
+	</div>
+					  
+	  <el-form ref="form"   :model="form" label-width="120px">
+		  <el-form-item label="名称"    prop="name" :rules="[{ required: true, message: '姓名不能为空'} ]"  > 
+		   	 <el-col :span="8">
+		   	 	<el-input type="input" v-model="form.name"></el-input>
+		   	 </el-col>
+		  </el-form-item>
+		  <el-form-item label="性别" prop="sex" :rules="[{ required: true, message: '性别不能为空'} ]" >
+		  		  <el-radio-group v-model="form.sex" size="medium">
+				      	 <el-radio :label="0" >女</el-radio>
+					    <el-radio :label="1">男</el-radio>
+				    </el-radio-group>
+		  </el-form-item>
+		   
+		  <el-form-item label="手机"    prop="telephone" :rules="[{ required: true, message: '手机不能为空'} ]"  > 
+		   	 <el-col :span="8">
+		   	 	<el-input type="input" v-model="form.telephone"></el-input>
+		   	 </el-col>
+		  </el-form-item>
+		  
+		   <el-form-item label="qq"     > 
+		   	 <el-col :span="8">
+		   	 	<el-input type="input" v-model="form.qq"></el-input>
+		   	 </el-col>
+		  </el-form-item>
+		  
+		    <el-form-item label="邮箱"     > 
+		   	 <el-col :span="8">
+		   	 	<el-input type="input" v-model="form.email"></el-input>
+		   	 </el-col>
+		  </el-form-item>
+		  
+		    <el-form-item label="微信"     > 
+		   	 <el-col :span="8">
+		   	 	<el-input type="input" v-model="form.weChat"></el-input>
+		   	 </el-col>
+		  </el-form-item>
+		   
+		  <el-form-item label="微博"      > 
+		   	 <el-col :span="8">
+		   	 	<el-input type="input" v-model="form.microblogContact"></el-input>
+		   	 </el-col>
+		  </el-form-item>
+		  
+		   <el-form-item label="地区" prop="locatedRegionCode"  :rules="[{ required: true, message: '地区不能为空'} ]">
+		        <el-col :span="4">
+		   			 <el-select v-model="form.region_province" @change="setCityList" placeholder="请选择省份">
+		    			  <el-option   v-for="item in  provinceList" :key="item.code" :label="item.names" :value="item.code"></el-option>
+		    		</el-select>
+		   		</el-col>
+		   		<el-col :span="4">
+		   			 <el-select v-model="form.locatedRegionCode"   ref="reginCodeFef"   @change="unloadData" clearable placeholder="请选择城市">
+		    			  <el-option   v-for="item in cityList" :key="item.code" :label="item.names" :value="item.code"></el-option>
+		    		</el-select>
+		   		</el-col>
+		  </el-form-item>
+		  
+	    <el-form-item  > 
+			 	 <el-col :span="8">
+					    <el-button type="primary" @click="onSubmit">保存</el-button>
+					    <!-- 	<a class="btn btn-primary" href="testElModel.html" >返回</a> -->
+<!-- 					    <el-button @click="returnDetail" >取消</el-button> -->
+			 	 </el-col>
+		  </el-form-item>
+		</el-form>
+			 
+		 
+			  
+<!-- 			  <span slot="footer" class="dialog-footer"> -->
+<!-- 			  	<a class="btn btn-primary" href="testElModel.html" >返回</a> -->
+<!-- 			    <el-button @click="dialogVisible = false">返回</el-button> -->
+<!-- 			    <el-button type="primary" @click="dialogVisible = false">确 定</el-button> -->
+<!-- 			  </span> -->
+		 </el-card>
+<!-- 			</el-dialog> -->
+						
+  </div>
+</body>
+  <!-- import Vue before Element -->
+<script src="${rc.contextPath}/statics/libs/jquery.min.js"></script>
+  <script src="${rc.contextPath}/statics/libs/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="${rc.contextPath}/statics/libs/elm_ui_index.js"></script>
+<script src="${rc.contextPath}/statics/util/address.js"></script> 
+<script src="${rc.contextPath}/statics/util/addressUtil.js"></script> 
+  <script>
+  
+//从地址或取参数
+  function GetQueryString(name) {
+  	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+  	var r = window.location.search.substr(1).match(reg);
+  	if (r != null)
+  		return unescape(r[2]);
+  	return null;
+  }
+//判断是否为手机号  
+  function isPoneAvailable(pone) {  
+    var myreg = /^[1][3,4,5,7,8,9][0-9]{9}$/;  
+    if (!myreg.test(pone)) {  
+      return false;  
+    } else {  
+      return true;  
+    }  
+  } 
+  
+  $(function () {
+	  //el.init(); 
+
+  var el = new Vue({
+      el: '#app',
+      mounted: function() {
+          var el = this;
+          setTimeout(function(){
+				 el.init();
+          },100);
+      },
+      data: function() {
+        return { 
+        	visible: true,
+        	dialogVisible:false,
+            form: {
+            	sex:0
+            },
+            dataVisible:false,
+            provinceList : getProvinceList(),
+			cityList : [],
+        }
+        
+      },
+      
+      methods: {
+    	init: function (){
+//     		el.queryCache();
+      		el.form.customerId = GetQueryString("id");
+      		let customerId = GetQueryString("id");
+      		if(customerId){
+      			
+      		}
+//     		el.queryRemarkList();
+    	},
+    	handleClose: function () {
+    		  el.dialogVisible = false;
+  		},
+  		onSubmit:function(){
+  			console.log(this.$refs['form'].validate());
+  			//表单验证方法
+  			if(!el.form.name|| el.form.sex==null ||!el.form.telephone||!el.form.locatedRegionCode){
+				console.log(el.form); 
+  				this.$message.error('请检查表单');
+				 return ;
+			}
+  			if(!isPoneAvailable(el.form.telephone)){
+  				this.$message.error('请输入正确11位手机号码');
+  				return ;
+  			}
+   			console.log(el.form);
+  			$.ajax({
+				type: "POST",
+			    url: "../customerbaseinfo/save",
+			    data:JSON.stringify(el.form),
+			    dataType: 'json',contentType:'application/json;charset=UTF-8',   
+			    success: function(r){
+			    	if(r.code==0){
+				    	console.log(r);
+				    	el.$message({
+				            message: '保存成功',
+				            type: 'success'
+				          });
+				    	//返回详情
+				    	el.returnDetail(r.id);
+			    	}else{
+			    		 this.$message.error('系统错误');
+			    	};
+				}
+			});
+  		},
+		returnDetail: function(id){
+			self.location='editCustomerInfo.html?customerId='+id; 
+		},
+		toUpdaeData: function(){
+			this.$forceUpdate();
+		},
+		setCityList : function(value) {
+			console.log(value);
+			var _cityList = getCityList(value);
+			el.cityList = [];
+			console.log(this.$refs['reginCodeFef']);
+			this.$refs['reginCodeFef'].clear;
+			for ( var k in _cityList) {
+				el.cityList.push(_cityList[k]);
+			}
+			el.form.locatedRegionCode = el.cityList[0].code;
+		},
+		unloadData :function (){
+			this.$forceUpdate();
+		}
+      }	
+     
+    })
+  });
+  </script>
+</html>

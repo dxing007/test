@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>医院信息</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			 <div class="row">
+				<div class="col-xs-3"> 
+					<label class="col-sm-2 control-label"  style="top: 8px;">名称</label>
+					<input   type="text"  v-model="q.name"  @keyup.enter="query"  style="width: 70%" class="form-control" placeholder="请输入名称">
+				</div>
+				<div class="col-xs-3">
+				    <label class="col-sm-2 control-label"   style="top: 8px">地区</label>
+					 <select v-model="q.regionCode" id="bak_province"  
+							 class="form-control" style="width: 70%">
+						 <option  v-for="item in provinceList"  :value="item.code" :key="item.code" >{{item.names}}</option>
+					 </select>
+				</div>
+				<a class="btn btn-default" @click="query">查询</a>  
+			 </div>
+			
+<!-- 			#if($shiro.hasPermission("hospitalinfo:save")) -->
+<!-- 			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a> -->
+<!-- 			#end -->
+<!-- 			#if($shiro.hasPermission("hospitalinfo:update")) -->
+<!-- 			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+<!-- 			#end -->
+<!-- 			#if($shiro.hasPermission("hospitalinfo:delete")) -->
+<!-- 			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+<!-- 			#end -->
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+											<div class="form-group">
+			   	<div class="col-sm-2 control-label">医院名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.name" placeholder="医院名称"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">状态 0 为启用 1 为禁用</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.statue" placeholder="状态 0 为启用 1 为禁用"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">地区编码</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.regionCode" placeholder="地区编码"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否公立医院 0 为公立 1 为私立</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.isPublic" placeholder="是否公立医院 0 为公立 1 为私立"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">医院网站</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.url" placeholder="医院网站"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">返点</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.rebate" placeholder="返点"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">权重影响排名</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.weightCoefficient" placeholder="权重影响排名"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">项目</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.project" placeholder="项目"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">医生信息</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.doctorInfo" placeholder="医生信息"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">医院描述</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.describe" placeholder="医院描述"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">创建时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.createTime" placeholder="创建时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">创建人</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.createUserId" placeholder="创建人"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">更新时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.lastUpdateTime" placeholder="更新时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">更新人</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="hospitalInfo.lastUpdateUserId" placeholder="更新人"/>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/hospitalinfo.js?_${date.systemTime}"></script>
+</body>
+</html>

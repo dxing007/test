@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("customerremark:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("customerremark:update"))
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("customerremark:delete"))
+			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+			 <div class="form-group">
+			   	<div class="col-sm-2 control-label">客户id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.customerId" placeholder="客户id"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">下次跟进时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.nextFollowTime" placeholder="下次跟进时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">最近跟进时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.lastFollowTime" placeholder="最近跟进时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否需要下次跟进</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.isfollow" placeholder="是否需要下次跟进"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">状态</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.status" placeholder="状态"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">权重</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.weight" placeholder="权重"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">当前情况</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.currentRemark" placeholder="当前情况"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">下次情况</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.nextRemark" placeholder="下次情况"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">创建时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.createTime" placeholder="创建时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.createUserId" placeholder=""/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.lastUpdateTime" placeholder=""/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="customerRemark.lastUpdateUserId" placeholder=""/>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/customerremark/customerremark.js?_${date.systemTime}"></script>
+</body>
+</html>

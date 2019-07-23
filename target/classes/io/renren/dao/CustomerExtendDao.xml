@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.CustomerExtendDao">
+
+	<select id="queryObject" resultType="io.renren.entity.CustomerExtendEntity">
+		select * from customer_extend where id = #{value}
+	</select>
+	
+	<select id="queryObjectByCustomerId" resultType="io.renren.entity.CustomerExtendEntity">
+		select * from customer_extend where customer_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="io.renren.entity.CustomerExtendEntity">
+		SELECT ce.*,c.name,c.sex,c.telephone,c.status ,c.`located_region_code`,c.create_time
+			,(SELECT s.name FROM `sys_user` s WHERE s.user_id = c.create_user_id) AS createUserName
+			,(SELECT s.name FROM `sys_user` s WHERE s.user_id = ce.last_update_user_id) AS lastUpdateUserName
+		  FROM customer_base_info c , `customer_extend` ce 
+		WHERE    c.`id` = ce.`customer_id` 
+		<if test="name != null and name.trim() != ''">
+			and	c.name like concat('%', #{name}, '%') 
+		</if>
+		<if test="status != null and status.trim() != ''">
+			and	c.status = #{status} 
+		</if>
+		<if test="telephone != null and telephone.trim() != ''">
+			and	c.telephone  like concat('%', #{telephone}, '%') 
+		</if>
+		<if test="sex != null">
+			and	c.sex = #{sex} 
+		</if>
+		<if test="qq != null">
+			and	c.qq like concat('%', #{qq}, '%') 
+		</if>
+		
+		<if test="createUserId != null">
+			and	c.create_user_id = #{createUserId} 
+		</if>
+		
+		 ORDER BY  c.create_time DESC 
+
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+		
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from customer_extend 
+	</select>
+	 
+	<insert id="save" parameterType="io.renren.entity.CustomerExtendEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into customer_extend
+		(
+			`customer_id`, 
+			`info_source`, 
+			`intention_area_code`, 
+			`bak_area_code`, 
+			`beauty_item_code`, 
+			`send_message`, 
+			`describe`, 
+			`create_time`, 
+			`create_user_id`, 
+			`last_update_time`, 
+			`last_update_user_id`
+		)
+		values
+		(
+			#{customerId}, 
+			#{infoSource}, 
+			#{intentionAreaCode}, 
+			#{bakAreaCode}, 
+			#{beautyItemCode}, 
+			#{sendMessage}, 
+			#{describe}, 
+			#{createTime}, 
+			#{createUserId}, 
+			#{lastUpdateTime}, 
+			#{lastUpdateUserId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="io.renren.entity.CustomerExtendEntity">
+		update customer_extend 
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="infoSource != null">`info_source` = #{infoSource}, </if>
+			<if test="intentionAreaCode != null">`intention_area_code` = #{intentionAreaCode}, </if>
+			<if test="bakAreaCode != null">`bak_area_code` = #{bakAreaCode}, </if>
+			<if test="beautyItemCode != null">`beauty_item_code` = #{beautyItemCode}, </if>
+			<if test="sendMessage != null">`send_message` = #{sendMessage}, </if>
+			<if test="describe != null">`describe` = #{describe}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="lastUpdateTime != null">`last_update_time` = #{lastUpdateTime}, </if>
+			<if test="lastUpdateUserId != null">`last_update_user_id` = #{lastUpdateUserId}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from customer_extend where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from customer_extend where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	
+	
+</mapper>
